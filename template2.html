@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Creative Resume Generator</title>
+  <!-- custom css -->
+  <link rel="stylesheet" href="assets/css/main.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    .chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            z-index: 9999; /* Make sure it stays on top */
+          }
+          
+          .chatbot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%; /* Optional: makes the image circular */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+          }
+          
+          .chatbot:hover img {
+            transform: scale(1.1); /* Slight zoom on hover */
+          }
+
+    /* Global Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #eaeaea;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #FF5733;
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 40px;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .form-section input,
+    .form-section textarea {
+      width: 100%;
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      background-color: #ffffff;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-section input:focus,
+    .form-section textarea:focus {
+      outline: none;
+      border-color: #FF5733;
+    }
+
+    .button {
+      background-color: #FF5733;
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 40px;
+      font-size: 18px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #FF2D1D;
+    }
+
+    .resume-preview {
+      display: flex;
+      gap: 40px;
+      background: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      margin-top: 40px;
+    }
+
+    .left-column {
+      width: 250px;
+      text-align: center;
+      border-right: 2px solid #e1e4e8;
+      padding-right: 30px;
+    }
+
+    .right-column {
+      flex: 1;
+    }
+
+    .profile-photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 20px;
+      border: 4px solid #FF5733;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #FF5733;
+      padding-bottom: 5px;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    ul li {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 5px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .resume-preview {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .left-column {
+        width: 100%;
+        padding-right: 0;
+        border-right: none;
+        text-align: center;
+      }
+
+      .right-column {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class = "navbar bg-white">
+    <div class="container">
+        <div class = "navbar-content">
+            <div class = "brand-and-toggler">
+                <a href = "index.html" class = "navbar-brand">
+                    <img src = "assets/images/Resume Builder.png" alt = "" class = "navbar-brand-icon">
+                    <span class = "navbar-brand-text">Resume <span>Builder.</span>
+                </a>
+                <button type = "button" class = "navbar-toggler-btn">
+                    <div class = "bars">
+                        <div class = "bar"></div>
+                        <div class = "bar"></div>
+                        <div class = "bar"></div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+  <h1>Creative Resume Generator</h1>
+
+  <button class="button" onclick="goBack()">Back to Resume Page</button>
+
+
+  <div class="form-section">
+    <input type="file" id="inputPhoto" accept="image/*" />
+    <input type="text" id="inputName" placeholder="Your Full Name" />
+    <input type="text" id ="inputContact" placeholder="Contact Information" />
+    <textarea id="inputSummary" placeholder="Professional Summary" rows="4"></textarea>
+    <textarea id="inputExperience" placeholder="Work Experience" rows="4"></textarea>
+    <textarea id="inputEducation" placeholder="Education" rows="4"></textarea>
+    <input type="text" id="inputSkills" placeholder="Skills (comma separated)" />
+
+    <button class="button" onclick="generatePreview()">Preview Resume</button>
+    <button class="button" onclick="downloadPDF()">Download PDF</button>
+  </div>
+
+  <div class="resume-preview" id="resumePreview" style="display: none;">
+    <div class="left-column">
+      <img id="profilePhoto" class="profile-photo" style="display: none;" />
+      <div class="section">
+        <h3>Contact Information</h3>
+        <p id="previewContact"></p>
+      </div>
+      <div class="section">
+        <h3>Skills</h3>
+        <ul id="previewSkills"></ul>
+      </div>
+    </div>
+    <div class="right-column">
+      <h2 id="previewName"></h2>
+      <div class="section">
+        <h3>Professional Summary</h3>
+        <p id="previewSummary"></p>
+      </div>
+      <div class="section">
+        <h3>Work Experience</h3>
+        <p id="previewExperience"></p>
+      </div>
+      <div class="section">
+        <h3>Education</h3>
+        <p id="previewEducation"></p>
+      </div>
+    </div>
+  </div>
+
+  <a href="index copy.html " class="chatbot"><img src="ai.png"></a>
+
+  <script>
+    let profileImageData = '';
+
+    function generatePreview() {
+      const name = document.getElementById('inputName').value;
+      const contact = document.getElementById('inputContact').value;
+      const summary = document.getElementById('inputSummary').value;
+      const experience = document.getElementById('inputExperience').value;
+      const education = document.getElementById('inputEducation').value;
+      const skills = document.getElementById('inputSkills').value.split(',').map(s => s.trim());
+
+      document.getElementById('previewName').textContent = name;
+      document.getElementById('previewContact').textContent = contact;
+      document.getElementById('previewSummary').textContent = summary;
+      document.getElementById('previewExperience').textContent = experience;
+      document.getElementById('previewEducation').textContent = education;
+
+      const skillList = document.getElementById('previewSkills');
+      skillList.innerHTML = '';
+      skills.forEach(skill => {
+        if (skill) {
+          const li = document.createElement('li');
+          li.textContent = skill;
+          skillList.appendChild(li);
+        }
+      });
+
+      const fileInput = document.getElementById('inputPhoto');
+      if (fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          profileImageData = e.target.result;
+          const img = document.getElementById('profilePhoto');
+          img.src = profileImageData;
+          img.style.display = 'block';
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      }
+
+      document.getElementById('resumePreview').style.display = 'flex';
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'pt', 'a4');
+      const leftMargin = 40;
+      const lineHeight = 18;
+      const pageWidth = 520; // max width for text
+      let y = 40;
+
+      // Add Profile Photo
+      if (profileImageData) {
+        doc.addImage(profileImageData, 'JPEG', leftMargin, y, 80, 80);
+        y += 90; // Add space after photo
+      }
+
+      // Add Name
+      const name = document.getElementById('inputName').value;
+      doc.setFontSize(24);
+      doc.setFont("Montserrat", "bold");
+      doc.text(name, leftMargin + 100, y);
+      y += lineHeight;
+
+      // Add Contact Info
+      const contact = document.getElementById('inputContact').value;
+      doc.setFontSize(12);
+      doc.setFont("Roboto", "normal");
+      doc.text(contact, leftMargin + 100, y);
+      y += lineHeight * 2;
+
+      // Add Professional Summary
+      const summary = document.getElementById('inputSummary').value;
+      doc.setFontSize(14);
+      doc.setFont("Montserrat", "bold");
+      doc.text('Professional Summary', leftMargin, y);
+      y += lineHeight;
+      doc.setFontSize(12);
+      doc.setFont("Roboto", "normal");
+      y = addMultilineText(doc, summary, leftMargin, y, pageWidth);
+
+      // Add Work Experience
+      const experience = document.getElementById('inputExperience').value;
+      doc.setFontSize(14);
+      doc.setFont("Montserrat", "bold");
+      doc.text('Work Experience', leftMargin, y);
+      y += lineHeight;
+      doc.setFontSize(12);
+      doc.setFont("Roboto", "normal");
+      y = addMultilineText(doc, experience, leftMargin, y, pageWidth);
+
+      // Add Education
+      const education = document.getElementById('inputEducation').value;
+      doc.setFontSize(14);
+      doc.setFont("Montserrat", "bold");
+      doc.text('Education', leftMargin, y);
+      y += lineHeight;
+      doc.setFontSize(12);
+      doc.setFont("Roboto", "normal");
+      y = addMultilineText(doc, education, leftMargin, y, pageWidth);
+
+      // Add Skills
+      const skills = document.getElementById('inputSkills').value;
+      doc.setFontSize(14);
+      doc.setFont("Montserrat", "bold");
+      doc.text('Skills', leftMargin, y);
+      y += lineHeight;
+      doc.setFontSize(12);
+      doc.setFont("Roboto", "normal");
+      y = addMultilineText(doc, skills, leftMargin, y, pageWidth);
+
+      doc.save("Creative_Resume.pdf");
+    }
+
+    function addMultilineText(doc, text, x, y, maxWidth) {
+      const lines = doc.splitTextToSize(text, maxWidth);
+      lines.forEach(line => {
+        if (y > 770) {
+          doc.addPage();
+          y = 40;
+        }
+        doc.text(line, x, y);
+        y += 18;
+      });
+      return y + 10;
+    }
+
+    function goBack() {
+  window.location.href = 'resume.html';
+}
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Generator</title>
+  <!-- custom css -->
+  <link rel="stylesheet" href="assets/css/main.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+
+.chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            z-index: 9999; /* Make sure it stays on top */
+          }
+          
+          .chatbot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%; /* Optional: makes the image circular */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+          }
+          
+          .chatbot:hover img {
+            transform: scale(1.1); /* Slight zoom on hover */
+          }
+
+    /* Reset & Bold Modern Style */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0d1117;
+  color: #ffffff;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px;
+  line-height: 1.6;
+}
+
+h1 {
+  text-align: center;
+  font-size: 38px;
+  font-weight: 900;
+  color: #facc15;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.form-section input,
+.form-section textarea {
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 2px solid #30363d;
+  border-radius: 10px;
+  font-size: 15px;
+  background-color: #161b22;
+  color: #ffffff;
+  font-weight: bold;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-section input:focus,
+.form-section textarea:focus {
+  outline: none;
+  border-color: #facc15;
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.7);
+}
+
+.button {
+  background-color: #facc15;
+  color: #000000;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 30px;
+  font-size: 16px;
+  font-weight: 700;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.button:hover {
+  background-color: #eab308;
+  transform: scale(1.05);
+}
+
+.resume-preview {
+  display: flex;
+  gap: 30px;
+  background: #161b22;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  margin-top: 40px;
+  border: 2px solid #30363d;
+}
+
+.left-column {
+  width: 280px;
+  text-align: center;
+  border-right: 2px solid #30363d;
+  padding-right: 30px;
+}
+
+.right-column {
+  flex: 1;
+  padding-left: 20px;
+}
+
+.profile-photo {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 5px solid #facc15;
+}
+
+.section {
+  margin-bottom: 25px;
+}
+
+.section h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #facc15;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  border-bottom: 2px solid #facc15;
+  padding-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+ul li {
+  font-size: 14px;
+  color: #c9d1d9;
+  margin-bottom: 6px;
+}
+
+p {
+  font-size: 14px;
+  color: #c9d1d9;
+}
+
+#previewName {
+  font-size: 26px;
+  font-weight: 900;
+  color: #facc15;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+  .resume-preview {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .left-column {
+    width: 100%;
+    padding-right: 0;
+    border-right: none;
+    border-bottom: 2px solid #30363d;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+
+  .right-column {
+    width: 100%;
+    padding-left: 0;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <nav class = "navbar bg-white">
+    <div class="container">
+        <div class = "navbar-content">
+            <div class = "brand-and-toggler">
+                <a href = "index.html" class = "navbar-brand">
+                    <img src = "assets/images/Resume Builder.png" alt = "" class = "navbar-brand-icon">
+                    <span class = "navbar-brand-text">Resume <span>Builder.</span>
+                </a>
+                <button type = "button" class = "navbar-toggler-btn">
+                    <div class = "bars">
+                        <div class = "bar"></div>
+                        <div class = "bar"></div>
+                        <div class = "bar"></div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+  <h1>Bold and Eye-Catching Resume Generator</h1>
+
+  <button class="button" onclick="goBack()">Back to Resume Page</button>
+
+  <div class="form-section">
+    <input type="file" id="inputPhoto" accept="image/*" />
+    <input type="text" id="inputName" placeholder="Your Name" />
+    <input type="text" id="inputContact" placeholder="Contact Info" />
+    <textarea id="inputSummary" placeholder="Professional Summary" rows="3"></textarea>
+    <textarea id="inputExperience" placeholder="Work Experience" rows="3"></textarea>
+    <textarea id="inputEducation" placeholder="Education" rows="3"></textarea>
+    <input type="text" id="inputSkills" placeholder="Skills (comma separated)" />
+
+    <button class="button" onclick="generatePreview()">Preview Resume</button>
+    <button class="button" onclick="downloadPDF()">Download PDF</button>
+  </div>
+
+  <div class="resume-preview" id="resumePreview">
+    <div class="left-column">
+      <img id="profilePhoto" class="profile-photo" style="display: none;" />
+      <div class="section">
+        <h3>Contact</h3>
+        <p id="previewContact"></p>
+      </div>
+      <div class="section">
+        <h3>Skills</h3>
+        <ul id="previewSkills"></ul>
+      </div>
+    </div>
+    <div class="right-column">
+      <h2 id="previewName" style="color: #00bcd4;"></h2>
+      <div class="section">
+        <h3>Summary</h3>
+        <p id="previewSummary"></p>
+      </div>
+      <div class="section">
+        <h3>Experience</h3>
+        <p id="previewExperience"></p>
+      </div>
+      <div class="section">
+        <h3>Education</h3>
+        <p id="previewEducation"></p>
+      </div>
+    </div>
+  </div>
+
+  <a href="index copy.html " class="chatbot"><img src="ai.png"></a>
+
+  <script>
+    let profileImageData = '';
+
+    function generatePreview() {
+      const name = document.getElementById('inputName').value;
+      const contact = document.getElementById('inputContact').value;
+      const summary = document.getElementById('inputSummary').value;
+      const experience = document.getElementById('inputExperience').value;
+      const education = document.getElementById('inputEducation').value;
+      const skills = document.getElementById('inputSkills').value.split(',').map(s => s.trim());
+
+      document.getElementById('previewName').textContent = name;
+      document.getElementById('previewContact').textContent = contact;
+      document.getElementById('previewSummary').textContent = summary;
+      document.getElementById('previewExperience').textContent = experience;
+      document.getElementById('previewEducation').textContent = education;
+
+      const skillList = document.getElementById('previewSkills');
+      skillList.innerHTML = '';
+      skills.forEach(skill => {
+        if (skill) {
+          const li = document.createElement('li');
+          li.textContent = skill;
+          skillList.appendChild(li);
+        }
+      });
+
+      const fileInput = document.getElementById('inputPhoto');
+      if (fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          profileImageData = e.target.result;
+          const img = document.getElementById('profilePhoto');
+          img.src = profileImageData;
+          img.style.display = 'block';
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      }
+
+      document.getElementById('resumePreview').style.display = 'flex';
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'pt', 'a4');
+      const leftMargin = 40;
+      const lineHeight = 18;
+      const pageWidth = 520;
+      let y = 40;
+
+      if (profileImageData) {
+        doc.addImage(profileImageData, 'JPEG', leftMargin, y, 80, 80);
+        y += 90;
+      }
+
+      const name = document.getElementById('inputName').value;
+      doc.setFontSize(24);
+      doc.setFont("Helvetica", "bold");
+      doc.text(name, leftMargin + 100, y);
+      y += lineHeight;
+
+      const contact = document.getElementById('inputContact').value;
+      doc.setFontSize(12);
+      doc.setFont("Helvetica", "normal");
+      doc.text(contact, leftMargin + 100, y);
+      y += lineHeight * 2;
+
+      const summary = document.getElementById('inputSummary').value;
+      doc.setFontSize(14);
+      doc.setFont("Helvetica", "bold");
+      doc.text('Professional Summary', leftMargin, y);
+      y += lineHeight;
+      doc.setFontSize(12);
+      y = addMultilineText(doc, summary, leftMargin, y, pageWidth);
+
+      const experience = document.getElementById('inputExperience').value;
+      doc.setFontSize(14);
+      doc.setFont("Helvetica", "bold");
+      doc.text('Work Experience', leftMargin, y);
+      y += lineHeight;
+      doc.setFontSize(12);
+      y = addMultilineText(doc, experience, leftMargin, y, pageWidth);
+
+      const education = document.getElementById('inputEducation').value;
+      doc.setFontSize(14);
+      doc.setFont("Helvetica", "bold");
+      doc.text('Education', leftMargin, y);
+      y += lineHeight;
+      doc.setFontSize(12);
+      y = addMultilineText(doc, education, leftMargin, y, pageWidth);
+
+      const skills = document.getElementById('inputSkills').value;
+      doc.setFontSize(14);
+      doc.setFont("Helvetica", "bold");
+      doc.text('Skills', leftMargin, y);
+      y += lineHeight;
+      doc.setFontSize(12);
+      y = addMultilineText(doc, skills, leftMargin, y, pageWidth);
+
+      doc.save("Modern_Resume.pdf");
+    }
+
+    function addMultilineText(doc, text, x, y, maxWidth) {
+      const lines = doc.splitTextToSize(text, maxWidth);
+      lines.forEach(line => {
+        if (y > 770) {
+          doc.addPage();
+          y = 40;
+        }
+        doc.text(line, x, y);
+        y += 18;
+      });
+      return y + 10;
+    }
+
+    function goBack() {
+      window.location.href = 'resume.html';
+    }
+  </script>
+</body>
+</html>
